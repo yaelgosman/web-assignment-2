@@ -1,0 +1,35 @@
+{
+  "name": "web-assignment-2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "npx nodemon",
+    "start": "npx ts-node index.ts",
+    "start:prod": "node index.js",
+    "build": "rimraf ./dist && tsc -p ./tsconfig.json",
+    "test": "ts-node ./node_modules/jest/bin/jest.js --config jest.config.ts --coverage --detectOpenHandles --forceExit",
+    "test:watch": "ts-node ./node_modules/jest/bin/jest.js --config jest.config.ts --watchAll --coverage --detectOpenHandles --forceExit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaelgosman/web-assignment-2.git"
+  },
+  "keywords": [],
+  "author": "Yael Gosman & Ofir Zanjiri",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yaelgosman/web-assignment-2/issues"
+  },
+  "homepage": "https://github.com/yaelgosman/web-assignment-2#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.1",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}
