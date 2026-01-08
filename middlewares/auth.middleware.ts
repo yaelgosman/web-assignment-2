@@ -13,13 +13,13 @@ const isAuthorized = async (
 ): Promise<void> => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    res.status(401).json({ error: "Authorization header missing" });
+    res.status(401).json({ error: "Authorization header not found!" });
     return;
   }
 
   const [scheme, token] = authHeader.split(" ");
   if (scheme !== "Bearer" || !token) {
-    res.status(401).json({ error: "Invalid authorization format" });
+    res.status(401).json({ error: "Authorization token missing!" });
     return;
   }
 
@@ -31,7 +31,7 @@ const isAuthorized = async (
     const user: IUser | null = await User.findById(decodedToken.userId);
 
     if (!user) {
-      res.status(401).json({ error: "User not found" });
+      res.status(401).json({ error: "User not found!" });
       return;
     }
 
