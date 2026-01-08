@@ -57,31 +57,24 @@ const postController = {
   },
 
   async deletePost(req: Request, res: Response): Promise<void> {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
       const { id } = req.params;
 
-      const post = await Post.findByIdAndDelete(id).session(session);
+      const post = await Post.findById(id);
+
       if (!post) {
-        await session.abortTransaction();
         res.status(404).json({ error: "Post not found" });
         return;
       }
 
-      await Comment.deleteMany({ postId: id }).session(session);
-      await post.deleteOne({ session });
-      await session.commitTransaction();
+      await Comment.deleteMany({ postId: id });
+      await post.deleteOne();
 
       res.json({ message: "Post deleted successfully" });
     } catch (error: any) {
-      await session.abortTransaction();
       res.status(500).json({ error: error.message });
-    } finally {
-      session.endSession();
     }
-  },
+  }
 };
 
 export default postController;

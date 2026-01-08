@@ -7,13 +7,13 @@ import { token, userId } from '../setup';
 describe('Post API', () => {
   it('should create a new post', async () => {
     const res = await request(app)
-        .post('/post')
-        .set('Authorization', token)
-        .send({
-          title: 'My new comment Post',
-          content: 'This is the content of my first post!',
-          sender: userId.toString(),
-        });
+      .post('/post')
+      .set('Authorization', token)
+      .send({
+        title: 'My new comment Post',
+        content: 'This is the content of my first post!',
+        sender: userId.toString(),
+      });
 
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('_id');
@@ -22,9 +22,9 @@ describe('Post API', () => {
 
   it('should return 400 for invalid post data', async () => {
     const res = await request(app)
-        .post('/post')
-        .set('Authorization', token)
-        .send({ title: '' });
+      .post('/post')
+      .set('Authorization', token)
+      .send({ title: '' });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.error).toBeDefined();
@@ -39,8 +39,8 @@ describe('Post API', () => {
     await post.save();
 
     const res = await request(app)
-        .get('/post')
-        .set('Authorization', token);
+      .get('/post')
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -57,8 +57,8 @@ describe('Post API', () => {
     await post.save();
 
     const res = await request(app)
-        .get(`/post?sender=${userId.toString()}`)
-        .set('Authorization', token);
+      .get(`/post?sender=${userId.toString()}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -75,11 +75,11 @@ describe('Post API', () => {
     await post.save();
 
     const res = await request(app)
-        .get(`/post/${post._id}`)
-        .set('Authorization', token);
+      .get(`/post/${post._id}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('_id', (post._id as String).toString());
+    expect(res.body).toHaveProperty('_id', post._id!.toString());
     expect(res.body.title).toBe(post.title);
   });
 
@@ -87,8 +87,8 @@ describe('Post API', () => {
     const fakeId = new Types.ObjectId();
 
     const res = await request(app)
-        .get(`/post/${fakeId}`)
-        .set('Authorization', token);
+      .get(`/post/${fakeId}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -103,12 +103,12 @@ describe('Post API', () => {
     await post.save();
 
     const res = await request(app)
-        .put(`/post/${post._id}`)
-        .set('Authorization', token)
-        .send({ title: 'Updated Title', content: 'Updated Content' });
+      .put(`/post/${post._id}`)
+      .set('Authorization', token)
+      .send({ title: 'Updated Title', content: 'Updated Content' });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('_id', (post._id as string).toString());
+    expect(res.body).toHaveProperty('_id', post._id!.toString());
     expect(res.body.title).toBe('Updated Title');
   });
 
@@ -116,9 +116,9 @@ describe('Post API', () => {
     const fakeId = new Types.ObjectId();
 
     const res = await request(app)
-        .put(`/post/${fakeId}`)
-        .set('Authorization', token)
-        .send({ title: 'Updated Title' });
+      .put(`/post/${fakeId}`)
+      .set('Authorization', token)
+      .send({ title: 'Updated Title' });
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -133,8 +133,8 @@ describe('Post API', () => {
     await post.save();
 
     const res = await request(app)
-        .delete(`/post/${post._id}`)
-        .set('Authorization', token);
+      .delete(`/post/${post._id}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Post deleted successfully');
@@ -147,8 +147,8 @@ describe('Post API', () => {
     const fakeId = new Types.ObjectId();
 
     const res = await request(app)
-        .delete(`/post/${fakeId}`)
-        .set('Authorization', token);
+      .delete(`/post/${fakeId}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');

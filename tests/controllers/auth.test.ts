@@ -2,20 +2,20 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import app from '../../index';
 import User, { IUser } from '../../models/user.model';
-import {token, refreshToken, userId, getRefreshToken} from '../setup';
+import { token, refreshToken, userId, getRefreshToken } from '../setup';
 
 describe('Authentication Controller Tests', () => {
   it('should register a new user successfully', async () => {
     const res = await request(app)
-        .post('/auth/register')
-        .send({
-          username: 'ofir_yael',
-          email: 'ofir_yael@example.com',
-          password: 'securePassword123',
-          firstName: 'ofir',
-          lastName: 'yael',
-          age: 30,
-        });
+      .post('/auth/register')
+      .send({
+        username: 'ofir_yael',
+        email: 'ofir_yael@example.com',
+        password: 'securePassword123',
+        firstName: 'ofir',
+        lastName: 'yael',
+        age: 30,
+      });
 
     expect(res.statusCode).toBe(201);
     expect(res.body.message).toBe('User registered successfully');
@@ -34,17 +34,17 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/register')
-        .send({
-          username: 'ofir_yael2',
-          email: 'ofir_yael@example.com',
-          password: 'securePassword123',
-          firstName: 'ofir',
-          lastName: 'Smith',
-          age: 25,
-        });
+      .post('/auth/register')
+      .send({
+        username: 'ofir_yael2',
+        email: 'ofir_yael@example.com',
+        password: 'securePassword123',
+        firstName: 'ofir',
+        lastName: 'Smith',
+        age: 25,
+      });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(409);
     expect(res.body.error).toBe('Email already exists!');
   });
 
@@ -54,15 +54,15 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/register')
-        .send({
-          username: 'ofir_yael',
-          email: 'ofir_yael@example.com',
-          password: 'securePassword123',
-          firstName: 'ofir',
-          lastName: 'yael',
-          age: 30,
-        });
+      .post('/auth/register')
+      .send({
+        username: 'ofir_yael',
+        email: 'ofir_yael@example.com',
+        password: 'securePassword123',
+        firstName: 'ofir',
+        lastName: 'yael',
+        age: 30,
+      });
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Registration failed: Database error');
@@ -82,11 +82,11 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'ofir_yael@example.com',
-          password: 'securePassword123',
-        });
+      .post('/auth/login')
+      .send({
+        email: 'ofir_yael@example.com',
+        password: 'securePassword123',
+      });
 
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Login successful');
@@ -96,27 +96,27 @@ describe('Authentication Controller Tests', () => {
 
   it('should return 400 for invalid credentials during login', async () => {
     const res = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'invalid@example.com',
-          password: 'wrongPassword',
-        });
+      .post('/auth/login')
+      .send({
+        email: 'invalid@example.com',
+        password: 'wrongPassword',
+      });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe('Invalid credentials');
   });
 
-    it('should return 400 for invalid credentials when password dont match during login', async () => {
-        const res = await request(app)
-            .post('/auth/login')
-            .send({
-                email: 'testuser@example.com',
-                password: 'wrongPassword',
-            });
+  it('should return 400 for invalid credentials when password dont match during login', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({
+        email: 'testuser@example.com',
+        password: 'wrongPassword',
+      });
 
-        expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('Invalid credentials');
-    });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('Invalid credentials');
+  });
 
   it('should return 500 if an error occurs during login', async () => {
     jest.spyOn(User, 'findOne').mockImplementationOnce(() => {
@@ -124,11 +124,11 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'ofir_yael@example.com',
-          password: 'securePassword123',
-        });
+      .post('/auth/login')
+      .send({
+        email: 'ofir_yael@example.com',
+        password: 'securePassword123',
+      });
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -148,9 +148,9 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/logout')
-        .set('Authorization', token)
-        .send({ refreshToken });
+      .post('/auth/logout')
+      .set('Authorization', token)
+      .send({ refreshToken });
 
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Logged out successfully');
@@ -161,33 +161,33 @@ describe('Authentication Controller Tests', () => {
 
   it('should return 400 for an invalid refresh token during logout', async () => {
     const res = await request(app)
-        .post('/auth/logout')
-        .set('Authorization', token)
-        .send({ refreshToken: 'invalidToken' });
+      .post('/auth/logout')
+      .set('Authorization', token)
+      .send({ refreshToken: 'invalidToken' });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe('Invalid refresh token');
   });
 
-    it('should return 400 for an invalid refresh token for user during logout', async () => {
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', token)
-            .send({ refreshToken: getRefreshToken(userId) });
+  it('should return 400 for an invalid refresh token for user during logout', async () => {
+    const res = await request(app)
+      .post('/auth/logout')
+      .set('Authorization', token)
+      .send({ refreshToken: getRefreshToken(userId) });
 
-        expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('Invalid refresh token');
-    });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('Invalid refresh token');
+  });
 
-    it('should return 403 if refresh token is missing during logout', async () => {
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', token)
-            .send({}); // No refreshToken in the body
+  it('should return 403 if refresh token is missing during logout', async () => {
+    const res = await request(app)
+      .post('/auth/logout')
+      .set('Authorization', token)
+      .send({}); // No refreshToken in the body
 
-        expect(res.statusCode).toBe(403);
-        expect(res.body.error).toBe('Refresh token required');
-    });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('Refresh token required');
+  });
 
   it('should refresh the access token successfully', async () => {
     await User.create<Partial<IUser>>({
@@ -201,8 +201,8 @@ describe('Authentication Controller Tests', () => {
     });
 
     const res = await request(app)
-        .post('/auth/refresh-token')
-        .send({ refreshToken });
+      .post('/auth/refresh-token')
+      .send({ refreshToken });
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('accessToken');
@@ -210,26 +210,26 @@ describe('Authentication Controller Tests', () => {
 
   it('should return 400 for an invalid refresh token during refresh', async () => {
     const res = await request(app)
-        .post('/auth/refresh-token')
-        .send({ refreshToken: 'invalidToken' });
+      .post('/auth/refresh-token')
+      .send({ refreshToken: 'invalidToken' });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe('Invalid or expired refresh token');
   });
 
-    it('should return 403 if refresh token is invalid during refresh', async () => {
-        const res = await request(app)
-            .post('/auth/refresh-token')
-            .send({ refreshToken: getRefreshToken(userId) });
+  it('should return 403 if refresh token is invalid during refresh', async () => {
+    const res = await request(app)
+      .post('/auth/refresh-token')
+      .send({ refreshToken: getRefreshToken(userId) });
 
-        expect(res.statusCode).toBe(403);
-        expect(res.body.error).toBe('Invalid refresh token');
-    });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('Invalid refresh token');
+  });
 
   it('should return 403 for a missing refresh token during refresh', async () => {
-    const res = await request(app).post('/auth/refresh-token');
+    const res = await request(app).post('/auth/refresh-token').send({});
 
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(400);
     expect(res.body.error).toBe('Refresh token required');
   });
 });

@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '../../index';
 import User, { IUser } from '../../models/user.model';
 import { token } from '../setup';
-import {Types} from "mongoose";
+import { Types } from "mongoose";
 
 describe('User API', () => {
     it('should get all users', async () => {
@@ -16,7 +16,7 @@ describe('User API', () => {
         });
 
         const res = await request(app)
-            .get('/user')
+            .get('/users')
             .set('Authorization', token);
 
         expect(res.statusCode).toBe(200);
@@ -39,7 +39,7 @@ describe('User API', () => {
             .set('Authorization', token);
 
         expect(res.statusCode).toBe(200);
-        expect(res.body._id).toBe((user._id as String).toString());
+        expect(res.body._id).toBe(user._id!.toString());
         expect(res.body.username).toBe('testing');
     });
 

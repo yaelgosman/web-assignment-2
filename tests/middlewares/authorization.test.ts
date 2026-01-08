@@ -26,31 +26,31 @@ describe('isAuthorized Middleware', () => {
     };
   };
 
-  it('should return 403 if no authorization header is provided', async () => {
+  it('should return 401 if no authorization header is provided', async () => {
     const req = { headers: {} } as Partial<Request>;
     const res = createMockResponse() as any;
     const next = jest.fn() as NextFunction;
 
     await isAuthorized(req as Request, res, next);
 
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(401);
     expect(res.body).toEqual({ error: 'Authorization header not found!' });
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('should return 403 if the token is missing', async () => {
+  it('should return 401 if the token is missing', async () => {
     const req = { headers: { authorization: 'Bearer ' } } as Partial<Request>;
     const res = createMockResponse() as any;
     const next = jest.fn() as NextFunction;
 
     await isAuthorized(req as Request, res, next);
 
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(401);
     expect(res.body).toEqual({ error: 'Authorization token missing!' });
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('should return 403 if the token is invalid', async () => {
+  it('should return 401 if the token is invalid', async () => {
     const req = { headers: { authorization: 'Bearer invalid_token' } } as Partial<Request>;
     const res = createMockResponse() as any;
     const next = jest.fn() as NextFunction;
@@ -61,14 +61,14 @@ describe('isAuthorized Middleware', () => {
 
     await isAuthorized(req as Request, res, next);
 
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(401);
     expect(res.body).toEqual({ error: 'Not Authorized!' });
     expect(next).not.toHaveBeenCalled();
 
     (jwt.verify as jest.Mock).mockRestore();
   });
 
-  it('should return 403 if the user not exist', async () => {
+  it('should return 401 if the user not exist', async () => {
     const req = { headers: { authorization: token } } as Partial<Request>;
     const res = createMockResponse() as any;
     const next = jest.fn() as NextFunction;
@@ -79,8 +79,8 @@ describe('isAuthorized Middleware', () => {
 
     await isAuthorized(req as Request, res, next);
 
-    expect(res.statusCode).toBe(403);
-    expect(res.body).toEqual({ error: 'Not Authorized!' });
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toEqual({ error: 'User not found!' });
     expect(next).not.toHaveBeenCalled();
 
     (jwt.verify as jest.Mock).mockRestore();

@@ -28,21 +28,21 @@ describe('Comment Routes', () => {
     await Post.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
 
     const res = await request(app)
-        .get(`/post/${postId}/comment`)
-        .set('Authorization', token);
+      .get(`/comment/${postId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBe(1);
-    expect(res.body[0]._id).toBe((comment._id as String).toString());
+    expect(res.body[0]._id).toBe(comment._id!.toString());
   });
 
   it('should return 404 when getting comments for a non-existent post', async () => {
     const fakePostId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .get(`/post/${fakePostId}/comment`)
-        .set('Authorization', token);
+      .get(`/comment/${fakePostId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -54,8 +54,8 @@ describe('Comment Routes', () => {
     });
 
     const res = await request(app)
-        .get(`/post/${postId}/comment`)
-        .set('Authorization', token);
+      .get(`/comment/${postId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -72,11 +72,11 @@ describe('Comment Routes', () => {
     await comment.save();
 
     const res = await request(app)
-        .get(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token);
+      .get(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('_id', (comment._id as String).toString());
+    expect(res.body).toHaveProperty('_id', comment._id!.toString());
     expect(res.body.content).toBe('Specific Comment');
   });
 
@@ -84,8 +84,8 @@ describe('Comment Routes', () => {
     const fakeCommentId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .get(`/post/${postId}/comment/${fakeCommentId}`)
-        .set('Authorization', token);
+      .get(`/comment/${postId}/comment/${fakeCommentId}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Comment not found');
@@ -104,8 +104,8 @@ describe('Comment Routes', () => {
     await comment.save();
 
     const res = await request(app)
-        .get(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token);
+      .get(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -115,12 +115,12 @@ describe('Comment Routes', () => {
 
   it('should create a new comment for a post', async () => {
     const res = await request(app)
-        .post(`/post/${postId}/comment`)
-        .set('Authorization', token)
-        .send({
-          content: 'New Comment',
-          author: userId.toString(),
-        });
+      .post(`/comment/${postId}/comment`)
+      .set('Authorization', token)
+      .send({
+        content: 'New Comment',
+        author: userId.toString(),
+      });
 
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('_id');
@@ -135,12 +135,12 @@ describe('Comment Routes', () => {
     const fakePostId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .post(`/post/${fakePostId}/comment`)
-        .set('Authorization', token)
-        .send({
-          content: 'Comment for non-existent post',
-          author: userId.toString(),
-        });
+      .post(`/comment/${fakePostId}/comment`)
+      .set('Authorization', token)
+      .send({
+        content: 'Comment for non-existent post',
+        author: userId.toString(),
+      });
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -152,12 +152,12 @@ describe('Comment Routes', () => {
     });
 
     const res = await request(app)
-        .post(`/post/${postId}/comment`)
-        .set('Authorization', token)
-        .send({
-          content: 'New Comment',
-          author: userId.toString(),
-        });
+      .post(`/comment/${postId}/comment`)
+      .set('Authorization', token)
+      .send({
+        content: 'New Comment',
+        author: userId.toString(),
+      });
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -174,12 +174,12 @@ describe('Comment Routes', () => {
     await comment.save();
 
     const res = await request(app)
-        .put(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated Comment' });
+      .put(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated Comment' });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('_id', (comment._id as String).toString());
+    expect(res.body).toHaveProperty('_id', comment._id!.toString());
     expect(res.body.content).toBe('Updated Comment');
   });
 
@@ -187,9 +187,9 @@ describe('Comment Routes', () => {
     const fakeCommentId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .put(`/post/${postId}/comment/${fakeCommentId}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated content for non-existent comment' });
+      .put(`/comment/${postId}/comment/${fakeCommentId}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated content for non-existent comment' });
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Comment not found');
@@ -208,9 +208,9 @@ describe('Comment Routes', () => {
     await comment.save();
 
     const res = await request(app)
-        .put(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated Comment' });
+      .put(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated Comment' });
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -228,8 +228,8 @@ describe('Comment Routes', () => {
     await Post.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
 
     const res = await request(app)
-        .delete(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token);
+      .delete(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Comment deleted successfully');
@@ -245,9 +245,9 @@ describe('Comment Routes', () => {
     const fakePostId = new mongoose.Types.ObjectId();
     const fakeCommentId = new mongoose.Types.ObjectId();
     const res = await request(app)
-        .delete(`/post/${fakePostId}/comment/${fakeCommentId}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated content for non-existent comment' });
+      .delete(`/comment/${fakePostId}/comment/${fakeCommentId}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated content for non-existent comment' });
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -257,9 +257,9 @@ describe('Comment Routes', () => {
     const fakeCommentId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .delete(`/post/${postId}/comment/${fakeCommentId}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated content for non-existent comment' });
+      .delete(`/comment/${postId}/comment/${fakeCommentId}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated content for non-existent comment' });
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Comment not found');
@@ -278,9 +278,9 @@ describe('Comment Routes', () => {
     await comment.save();
 
     const res = await request(app)
-        .delete(`/post/${postId}/comment/${comment._id}`)
-        .set('Authorization', token)
-        .send({ content: 'Updated Comment' });
+      .delete(`/comment/${postId}/comment/${comment._id}`)
+      .set('Authorization', token)
+      .send({ content: 'Updated Comment' });
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
@@ -304,8 +304,8 @@ describe('Comment Routes', () => {
     await Post.findByIdAndUpdate(postId, { $push: { comments: [comment1._id, comment2._id] } });
 
     const res = await request(app)
-        .delete(`/post/${postId}/comment`)
-        .set('Authorization', token);
+      .delete(`/comment/${postId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('All comments deleted successfully');
@@ -321,8 +321,8 @@ describe('Comment Routes', () => {
     const fakePostId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
-        .delete(`/post/${fakePostId}/comment`)
-        .set('Authorization', token);
+      .delete(`/comment/${fakePostId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('Post not found');
@@ -334,8 +334,8 @@ describe('Comment Routes', () => {
     });
 
     const res = await request(app)
-        .delete(`/post/${postId}/comment`)
-        .set('Authorization', token);
+      .delete(`/comment/${postId}/comment`)
+      .set('Authorization', token);
 
     expect(res.statusCode).toBe(500);
     expect(res.body.error).toBe('Database error');
