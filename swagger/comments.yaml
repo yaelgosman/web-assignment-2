@@ -1,5 +1,5 @@
 paths:
-  /post/{postId}/comment:
+  /comment/{postId}/comment:
     get:
       summary: Get all comments for a post
       tags:
@@ -66,7 +66,7 @@ paths:
           description: Post not found
         '401':
           description: Unauthorized
-  /post/{postId}/comment/{commentId}:
+  /comment/{postId}/comment/{commentId}:
     get:
       summary: Get a specific comment by ID
       tags:
