@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/user.model";
@@ -7,39 +7,23 @@ interface ITokenPayload {
   userId: string;
 }
 
-type JwtExpiresIn = number | `${number}${"s" | "m" | "h" | "d"}`;
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
-
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN as JwtExpiresIn;
-const JWT_REFRESH_EXPIRES_IN = process.env
-  .JWT_REFRESH_EXPIRES_IN as JwtExpiresIn;
-
-const signAccessToken = (userId: string) =>
-  jwt.sign({ userId }, JWT_SECRET!, {
-    expiresIn: JWT_EXPIRES_IN ?? "234",
-  });
-
-const signRefreshToken = (userId: string) =>
-  jwt.sign({ userId }, JWT_REFRESH_SECRET!, {
-    expiresIn: JWT_REFRESH_EXPIRES_IN,
-  });
-
 const authController = {
-  async register(req: Request, res: Response): Promise<void> {
+  async register(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const { username, email, password, firstName, lastName, age } = req.body;
-
     try {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        res.status(409).json({ error: "Email already exists" });
+      const existUser = await User.exists({ email });
+      if (existUser) {
+        res.status(409).json({ error: "Email already exists!" });
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const user = await User.create({
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const newUser = new User<Partial<IUser>>({
         username,
         email,
         password: hashedPassword,
@@ -47,29 +31,26 @@ const authController = {
         lastName,
         age,
       });
+      await newUser.save();
 
-      res.status(201).json({
-        message: "User registered successfully",
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-        },
-      });
-    } catch (err) {
-      res.status(500).json({
-        error: err instanceof Error ? err.message : "Registration failed",
-      });
+      res
+        .status(201)
+        .json({ message: "User registered successfully", newUser });
+    } catch (ex) {
+      res
+        .status(500)
+        .json({
+          error: `Registration failed: ${ex instanceof Error ? ex.message : "Unknown error"
+            }`,
+        });
     }
   },
 
-  async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email, password } = req.body;
 
     try {
-      const user = await User.findOne({ email }).select(
-        "+password +refreshToken"
-      );
+      const user = await User.findOne({ email }).select("+password");
       if (!user) {
         res.status(401).json({ error: "Invalid credentials" });
         return;
@@ -81,21 +62,29 @@ const authController = {
         return;
       }
 
-      const accessToken = signAccessToken(user._id.toString());
-      const refreshToken = signRefreshToken(user._id.toString());
+      const accessToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET!,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+      );
+      const refreshToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_REFRESH_SECRET!,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
+      );
 
       user.refreshToken = refreshToken;
       await user.save();
 
-      res.status(200).json({ accessToken, refreshToken });
-    } catch (err) {
-      res.status(500).json({
-        error: err instanceof Error ? err.message : "Login failed",
-      });
+      res
+        .status(200)
+        .json({ message: "Login successful", accessToken, refreshToken });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
     }
   },
 
-  async logout(req: Request, res: Response): Promise<void> {
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
@@ -104,12 +93,14 @@ const authController = {
     }
 
     try {
-      const payload = jwt.verify(
+      const decodedToken = jwt.verify(
         refreshToken,
         process.env.JWT_REFRESH_SECRET!
       ) as ITokenPayload;
+      const user = await User.findById(decodedToken.userId).select(
+        "+refreshToken"
+      );
 
-      const user = await User.findById(payload.userId).select("+refreshToken");
       if (!user || user.refreshToken !== refreshToken) {
         res.status(401).json({ error: "Invalid refresh token" });
         return;
@@ -119,12 +110,16 @@ const authController = {
       await user.save();
 
       res.status(200).json({ message: "Logged out successfully" });
-    } catch {
+    } catch (err) {
       res.status(401).json({ error: "Invalid refresh token" });
     }
   },
 
-  async refreshToken(req: Request, res: Response): Promise<void> {
+  async refreshToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
@@ -133,20 +128,26 @@ const authController = {
     }
 
     try {
-      const payload = jwt.verify(
+      const decodedToken = jwt.verify(
         refreshToken,
         process.env.JWT_REFRESH_SECRET!
       ) as ITokenPayload;
+      const user = await User.findById(decodedToken.userId).select(
+        "+refreshToken"
+      );
 
-      const user = await User.findById(payload.userId).select("+refreshToken");
       if (!user || user.refreshToken !== refreshToken) {
         res.status(401).json({ error: "Invalid refresh token" });
         return;
       }
 
-      const newAccessToken = signAccessToken(user._id.toString());
+      const newAccessToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET!,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+      );
       res.status(200).json({ accessToken: newAccessToken });
-    } catch {
+    } catch (err) {
       res.status(401).json({ error: "Invalid or expired refresh token" });
     }
   },
