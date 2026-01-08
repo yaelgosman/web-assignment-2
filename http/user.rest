@@ -1,0 +1,85 @@
+@accessToken = <YOUR_ACCESS_TOKEN>
+@refreshToken = <YOUR_REFRESH_TOKEN>
+@userId = 674a20c5ddaadf7320f6424d
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#~~~~~~~~~~~ Users ~~~~~~~~~~~~#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Add a new user
+POST http://localhost:3001/auth/register
+Content-Type: application/json
+
+{
+  "username": "harel_1",
+  "email": "harel@example.com",
+  "password": "strongPassword123",
+  "firstName": "Harel",
+  "lastName": "Giladi",
+  "age": 30
+}
+
+###
+
+# User login
+POST http://localhost:3001/auth/login
+Content-Type: application/json
+
+{
+  "email": "harel@example.com",
+  "password": "strongPassword123"
+}
+
+###
+
+# User logout
+POST http://localhost:3001/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+###
+
+# Request a new Access Token using the Refresh Token
+POST http://localhost:3001//auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+
+# Get a specific user by ID
+GET http://localhost:3001/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Get all users
+GET http://localhost:3001/user
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Update a user (allowed fields: firstName, lastName, age)
+PUT http://localhost:3001/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "firstName": "James",
+  "lastName": "Smith",
+  "age": 28
+}
+
+###
+
+# Delete a user by ID
+DELETE http://localhost:3001/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+###

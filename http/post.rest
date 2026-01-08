@@ -1,0 +1,56 @@
+@accessToken = <YOUR_ACCESS_TOKEN>
+@postId = 674a216bddaadf7320f6727c
+@senderId = 674a20c5ddaadf7320f6424d
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#~~~~~~~~~~~ Posts ~~~~~~~~~~~~#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Add a new post
+POST http://localhost:3001/post
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "My new Post",
+  "content": "This is my first post!",
+  "sender": "{{senderId}}"
+}
+
+###
+
+# Get all posts
+GET http://localhost:3001/post
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Get a post by ID
+GET http://localhost:3001/post/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Get posts by sender
+GET http://localhost:3001/post?sender={{senderId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Update a post
+PUT http://localhost:3001/post/{{postId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "My new comment Post - Updated",
+  "content": "Updated the content of my post!"
+}
+
+###
+
+# Delete a post
+DELETE http://localhost:3001/post/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+###

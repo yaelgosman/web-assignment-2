@@ -142,7 +142,7 @@ paths:
                     description: New JWT access token
         '400':
           description: Invalid or expired refresh token
-  /user:
+  /users:
     get:
       summary: Retrieve all users
       tags:

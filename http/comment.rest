@@ -1,0 +1,50 @@
+@accessToken = <YOUR_ACCESS_TOKEN>
+@postId = 674a216bddaadf7320f6828c
+@commentId = 6738b9c30e8d99f8abfb5db3
+@senderId = 674a20c5ddaadf7320f6827d
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#~~~~~~~~~~ Comments ~~~~~~~~~~#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Get all comments for a post
+GET http://localhost:3001/post/{{postId}}/comment
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+# Get a specific comment by ID
+GET http://localhost:3001/post/{{postId}}/comment/{{commentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+# Create a new comment for a post
+POST http://localhost:3001/post/{{postId}}/comment
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "This is another comment3",
+  "author": "{{senderId}}"
+}
+
+###
+
+# Update an existing comment
+PUT http://localhost:3001/post/{{postId}}/comment/{{commentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "This is a new comment - updated"
+}
+
+###
+
+# Delete a comment
+DELETE http://localhost:3001/post/{{postId}}/comment/{{commentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
