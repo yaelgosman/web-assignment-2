@@ -1,0 +1,141 @@
+paths:
+  /post:
+    post:
+      summary: Add a new post
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title of the post
+                content:
+                  type: string
+                  description: Content of the post
+                sender:
+                  type: string
+                  description: ID of the sender (user)
+              required:
+                - title
+                - content
+                - sender
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      summary: Retrieve all posts
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '401':
+          description: Unauthorized
+  /post/{postId}:
+    get:
+      summary: Retrieve a post by ID
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the post to retrieve
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update a post
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the post to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Updated title
+                content:
+                  type: string
+                  description: Updated content
+              required:
+                - title
+                - content
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Delete a post
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the post to delete
+      responses:
+        '200':
+          description: Post deleted successfully
+        '404':
+          description: Post not found
+        '401':
+          description: Unauthorized

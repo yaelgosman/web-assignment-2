@@ -3,15 +3,19 @@ import mongoose from "mongoose";
 import path from "path";
 import dotenv from "dotenv";
 import routes from "./routes/index";
+import swaggerSetup from "./swagger";
 
 dotenv.config({ path: path.join(__dirname, "./.env") });
 process.env.rootDir = __dirname;
 const PORT = process.env.PORT;
+
 const app: Express = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", routes);
+
+swaggerSetup(app);
 
 export const startServer = async (): Promise<ReturnType<
   Express["listen"]
