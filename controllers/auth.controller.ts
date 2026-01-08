@@ -65,12 +65,12 @@ const authController = {
       const accessToken = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        { expiresIn: process.env.JWT_EXPIRES_IN } as any
       );
       const refreshToken = jwt.sign(
         { userId: user._id },
         process.env.JWT_REFRESH_SECRET!,
-        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN } as any
       );
 
       user.refreshToken = refreshToken;
@@ -144,7 +144,7 @@ const authController = {
       const newAccessToken = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        { expiresIn: process.env.JWT_EXPIRES_IN } as any
       );
       res.status(200).json({ accessToken: newAccessToken });
     } catch (err) {
