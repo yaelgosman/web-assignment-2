@@ -1,0 +1,101 @@
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the post
+        title:
+          type: string
+          description: Title of the post
+        content:
+          type: string
+          description: Content of the post
+        sender:
+          type: string
+          description: ID of the user who created the post
+        comments:
+          type: array
+          items:
+            type: string
+            description: IDs of associated comments
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was last updated
+      required:
+        - title
+        - content
+        - sender
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the user
+        username:
+          type: string
+          description: Username of the user
+        email:
+          type: string
+          description: Email of the user
+        firstName:
+          type: string
+          description: First name of the user
+        lastName:
+          type: string
+          description: Last name of the user
+        age:
+          type: integer
+          description: Age of the user
+          maximum: 120
+        password:
+          type: string
+          description: Hashed password of the user (not returned by default)
+        refreshToken:
+          type: string
+          description: Refresh token for authentication (not returned by default)
+      required:
+        - username
+        - email
+        - firstName
+        - lastName
+        - age
+        - password
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the comment
+        postId:
+          type: string
+          description: ID of the associated post
+        content:
+          type: string
+          description: Content of the comment
+        author:
+          type: string
+          description: ID of the user who wrote the comment
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the comment was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the comment was last updated
+      required:
+        - postId
+        - content
+        - author
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
