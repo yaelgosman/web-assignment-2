@@ -49,7 +49,11 @@ describe('Main Server Tests', () => {
 
         await expect(startServer()).rejects.toThrow('Connection failed');
 
-        expect(mockError).toHaveBeenCalledWith(error.stack);
+        expect(mockError).toHaveBeenCalledWith(
+            "Error", 
+            "Connection failed", 
+            "Stack",
+            error.stack);
     });
 
     it('should respond with 404 for unknown routes', async () => {
